@@ -1,0 +1,104 @@
+<!doctype html><html lang=en>
+<head>
+<title>CGRA Acceleration of Barnes-Hut :: Parker's Projects</title>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=description content="From 2020-2021 I worked on researching irregular algorithm acceleration using CGRAs. While Barnes-Hut is easily parallelizable, there are interesting methods that can be used to exploit cache locality to further accelerate it.
+Mapping this algorithm to a CGRA was particularly hard because the tree traversal appears to require a variable state size (ie. a stack or recursive function calls). Since the CGRA has a fixed amount of data that can easily fit into the pipeline, this becomes challenging.">
+<meta name=keywords content>
+<meta name=robots content="noodp">
+<link rel=canonical href=/posts/barnes-hut/>
+<link rel=stylesheet href=/assets/style.css>
+<link rel=stylesheet href=/assets/blue.css>
+<link rel=apple-touch-icon href=/img/apple-touch-icon-192x192.png>
+<link rel="shortcut icon" href=/img/favicon/blue.png>
+<meta name=twitter:card content="summary">
+<meta property="og:locale" content="en">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CGRA Acceleration of Barnes-Hut">
+<meta property="og:description" content="From 2020-2021 I worked on researching irregular algorithm acceleration using CGRAs. While Barnes-Hut is easily parallelizable, there are interesting methods that can be used to exploit cache locality to further accelerate it.
+Mapping this algorithm to a CGRA was particularly hard because the tree traversal appears to require a variable state size (ie. a stack or recursive function calls). Since the CGRA has a fixed amount of data that can easily fit into the pipeline, this becomes challenging.">
+<meta property="og:url" content="/posts/barnes-hut/">
+<meta property="og:site_name" content="Parker's Projects">
+<meta property="og:image" content="/img/favicon/blue.png">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+<meta property="article:published_time" content="2021-12-06 16:50:16 -0500 -0500">
+</head>
+<body class=blue>
+<div class="container center headings--one-size">
+<header class=header>
+<div class=header__inner>
+<div class=header__logo>
+<a href=/>
+<div class=logo>
+inyo.dev
+</div>
+</a>
+</div>
+<div class=menu-trigger>menu</div>
+</div>
+<nav class=menu>
+<ul class="menu__inner menu__inner--desktop">
+<li><a href=https://github.com/huntingt>github</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href=https://github.com/huntingt>github</a></li>
+</ul>
+</nav>
+</header>
+<div class=content>
+<div class=post>
+<h1 class=post-title>
+<a href=/posts/barnes-hut/>CGRA Acceleration of Barnes-Hut</a></h1>
+<div class=post-meta>
+<span class=post-date>
+2021-12-06
+</span>
+</div>
+<div class=post-content><div>
+<p>From 2020-2021 I worked on researching irregular algorithm acceleration using
+CGRAs. While Barnes-Hut is easily parallelizable, there are interesting methods
+that can be used to exploit cache locality to further accelerate it.</p>
+<p>Mapping
+this algorithm to a CGRA was particularly hard because the tree traversal
+appears to require a variable state size (ie. a stack or recursive function
+calls). Since the CGRA has a fixed amount of data that can easily fit into the
+pipeline, this becomes challenging. Fortunately the algorithm can be mapped so
+the tree traversal state is fixed in size (and very small).</p>
+<p>I also designed a small hardware accelerator that could be added to the CGRA to
+help schedule the memory accesses and further increase the performance.</p>
+<h1 id=links>Links<a href=#links class=hanchor arialabel=Anchor>&#8983;</a> </h1>
+<ul>
+<li><a href=/6_UAR_Paper.pdf>Paper</a></li>
+</ul>
+</div></div>
+<div class=pagination>
+<div class=pagination__title>
+<span class=pagination__title-h>Read other posts</span>
+<hr>
+</div>
+<div class=pagination__buttons>
+<span class="button next">
+<a href=/posts/fpga-ray-tracer/>
+<span class=button__text>FPGA Ray Tracer</span>
+<span class=button__icon>→</span>
+</a>
+</span>
+</div>
+</div>
+</div>
+</div>
+<footer class=footer>
+<div class=footer__inner>
+<div class=copyright>
+<span>© 2021 Powered by <a href=http://gohugo.io>Hugo</a></span>
+<span>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
+</div>
+</div>
+</footer>
+<script src=/assets/main.js></script>
+<script src=/assets/prism.js></script>
+</div>
+</body>
+</html>

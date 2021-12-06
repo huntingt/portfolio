@@ -1,0 +1,200 @@
+<!doctype html><html lang=en>
+<head>
+<title>Audio Chat :: Parker's Projects</title>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=description content="I made this simple audio chat software to play with signal modulation and encoding. The signal is encoded using 4-QAM or 16-QAM and uses matched SRRC filters. The hardest part of the system was the preamble detection used to start and determine the corrections necessary for a signal to be received. The software is also complicated by the fact that it is designed to operate in a chat system and thus does the signal detection and demodulation in real time.">
+<meta name=keywords content>
+<meta name=robots content="noodp">
+<link rel=canonical href=/posts/audio-chat/>
+<link rel=stylesheet href=/assets/style.css>
+<link rel=stylesheet href=/assets/blue.css>
+<link rel=apple-touch-icon href=/img/apple-touch-icon-192x192.png>
+<link rel="shortcut icon" href=/img/favicon/blue.png>
+<meta name=twitter:card content="summary">
+<meta property="og:locale" content="en">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Audio Chat">
+<meta property="og:description" content="I made this simple audio chat software to play with signal modulation and encoding. The signal is encoded using 4-QAM or 16-QAM and uses matched SRRC filters. The hardest part of the system was the preamble detection used to start and determine the corrections necessary for a signal to be received. The software is also complicated by the fact that it is designed to operate in a chat system and thus does the signal detection and demodulation in real time.">
+<meta property="og:url" content="/posts/audio-chat/">
+<meta property="og:site_name" content="Parker's Projects">
+<meta property="og:image" content="/img/favicon/blue.png">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+<meta property="article:published_time" content="2021-12-05 11:11:39 -0500 -0500">
+</head>
+<body class=blue>
+<div class="container center headings--one-size">
+<header class=header>
+<div class=header__inner>
+<div class=header__logo>
+<a href=/>
+<div class=logo>
+inyo.dev
+</div>
+</a>
+</div>
+<div class=menu-trigger>menu</div>
+</div>
+<nav class=menu>
+<ul class="menu__inner menu__inner--desktop">
+<li><a href=https://github.com/huntingt>github</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href=https://github.com/huntingt>github</a></li>
+</ul>
+</nav>
+</header>
+<div class=content>
+<div class=post>
+<h1 class=post-title>
+<a href=/posts/audio-chat/>Audio Chat</a></h1>
+<div class=post-meta>
+<span class=post-date>
+2021-12-05
+</span>
+</div>
+<div class=post-content><div>
+<img src=/demo.png class=center style=border-radius:8px;width:50%>
+<p>I made this simple audio chat software to play with signal modulation and
+encoding. The signal is encoded using 4-QAM or 16-QAM and uses matched SRRC
+filters. The hardest part of the system was
+the preamble detection used to start and determine the corrections necessary
+for a signal to be received. The software is also complicated by the fact
+that it is designed to operate in a chat system and thus does the signal
+detection and demodulation in real time.</p>
+<h1 id=signal-detection>Signal Detection<a href=#signal-detection class=hanchor arialabel=Anchor>&#8983;</a> </h1>
+<h2 id=first-attempt>First Attempt<a href=#first-attempt class=hanchor arialabel=Anchor>&#8983;</a> </h2>
+<p>When I was first designing the signal detection, I stayed away from correlating
+the expected preamble samples against the signal and instead followed a state
+machine based approach that requires less computation. I did this by holding
+the modulating a <code>1+0.j</code> in the QI plane for <code>N</code> symbols. I would then transmit
+<code>-1+0.j</code> followed by <code>1+0.j</code> before finally starting the transmission. I could
+first sample the center 50% of the initial preamble and average that to correct
+for the phase and amplitude. The short reversal to <code>-1+0.j</code> then provided a peak that I
+could fit against a quadratic to synchronize the time.</p>
+<p>I could then accept or reject the corrections based
+off of minimum amplitude and maximum amplitude variation requirements. This
+inital approach, however, was very tempermental because the time
+synchronization portion of the signal was very short and extremely sensitive to
+noise.</p>
+<h2 id=second-attempt>Second Attempt<a href=#second-attempt class=hanchor arialabel=Anchor>&#8983;</a> </h2>
+<p>I improved this initial approach by instead alternating between peaks of
+amplitude 1 at phase offsets of 90 degrees and signals of zero. Since we don&rsquo;t
+know the signal phase offset when detecting the preamble, the preamble is
+really encoded in the phase differences.</p>
+<p>The detection state machine works by recording the most recent <code>N</code> peaks and the
+times that they occured at, where <code>N</code> is the number of peaks in the preamble.
+Peaks are detected by entering a detection state once the signal exceeds 80% of
+the maxium previously detected peak. Once the signal falls bellow 60% of the
+current peak maximum, then the peak is recorded as the maxium value in the
+interval.</p>
+<p>This system does have the problem that spurious noise in the signal band may
+register as an unusually large peak that raises the 80% detection threshold
+above any legitimant preamble signals, causing the system to lockup. Since we
+know the length of the preamble, however, the system simply discards all peaks
+that are too old to detect.</p>
+<p>Once a sufficient number of peaks have been detected, the detection times can
+be fit to determine the timing offset, and the amplitudes can be multiplied by
+the complex conjugate of the preamble to correct the amplitude and phase
+offsets. If the preamble has acceptibly accurate corrections, then it will be
+accepted and the signal detection will start.</p>
+<p>This approach has the nice side effect that the minimum detection threshold can be
+significanly lower than in my first approach since this method can
+effictively be interrupted even if it has spurious peaks of smaller amplitude.</p>
+<h2 id=performance>Performance<a href=#performance class=hanchor arialabel=Anchor>&#8983;</a> </h2>
+<p>1000 random bits modulated with 16-QAM were sent over a AWGN channel with
+varying noise amplitudes and I measured the SNR of the signal and the MER.</p>
+<table>
+<thead>
+<tr>
+<th>Signal SNR (dB)</th>
+<th>Constellation MER (dB)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>51.7</td>
+<td>28.4</td>
+</tr>
+<tr>
+<td>23.3</td>
+<td>22.5</td>
+</tr>
+<tr>
+<td>17.6</td>
+<td>17.0</td>
+</tr>
+<tr>
+<td>15.9</td>
+<td>15.8</td>
+</tr>
+<tr>
+<td>&lt; ~15</td>
+<td>no detection</td>
+</tr>
+</tbody>
+</table>
+<p>The preamble detector seems to have a minimum noise floor, but otherwise
+performs fairly well under more challenging situations. Bellow an SNR of about
+15 dB, the preamble detection stops working even though the BER is typically &lt;
+0.01.</p>
+<p>An example constellation is shown below:</p>
+<img src=/16qam.png class=center style=border-radius:8px;width:50%>
+<h1 id=problems>Problems<a href=#problems class=hanchor arialabel=Anchor>&#8983;</a> </h1>
+<p>Currently, the audio chat app works well when sending and receiving data
+between a computer and itself. When trying to communicate between computers,
+communication reliability can be rather hit or miss, depending on the location
+and the computers. I suspect that the speaker and microphone&rsquo;s frequency
+response are non trivial, and echos along with any post processing in the
+OS are making this very difficult. Ultimantly, I need to do a good job
+characterizing the channel in different configurations to know for sure.</p>
+<h2 id=decoding>Decoding<a href=#decoding class=hanchor arialabel=Anchor>&#8983;</a> </h2>
+<p>I would also like to try incorporating soft decoding by using something like a
+viterbi decoder. I haven&rsquo;t been able to find literature, however, that shows
+how to do this in a fairly general method that would allow puncturing to fine
+tune the code rate. The problem is that the codes are in terms of bits while
+the modem is communicating in symbols in some QAM constellation. So to assign a
+branch metric can be rather hard since there are multiple symbols that may have
+a bit, and not all bits are in a symbol if code puncturing is used to increase
+the code rate.</p>
+<h1 id=links>Links<a href=#links class=hanchor arialabel=Anchor>&#8983;</a> </h1>
+<ul>
+<li><a href=https://github.com/huntingt/audio-chat>Source Code</a></li>
+</ul>
+</div></div>
+<div class=pagination>
+<div class=pagination__title>
+<span class=pagination__title-h>Read other posts</span>
+<hr>
+</div>
+<div class=pagination__buttons>
+<span class="button previous">
+<a href=/posts/fpga-ray-tracer/>
+<span class=button__icon>←</span>
+<span class=button__text>FPGA Ray Tracer</span>
+</a>
+</span>
+<span class="button next">
+<a href=/posts/photo-server/>
+<span class=button__text>Photo Server</span>
+<span class=button__icon>→</span>
+</a>
+</span>
+</div>
+</div>
+</div>
+</div>
+<footer class=footer>
+<div class=footer__inner>
+<div class=copyright>
+<span>© 2021 Powered by <a href=http://gohugo.io>Hugo</a></span>
+<span>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
+</div>
+</div>
+</footer>
+<script src=/assets/main.js></script>
+<script src=/assets/prism.js></script>
+</div>
+</body>
+</html>

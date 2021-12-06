@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Parker's Projects</title><link>/posts/</link><description>Recent content in Posts on Parker's Projects</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 06 Dec 2021 16:50:16 -0500</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>CGRA Acceleration of Barnes-Hut</title><link>/posts/barnes-hut/</link><pubDate>Mon, 06 Dec 2021 16:50:16 -0500</pubDate><guid>/posts/barnes-hut/</guid><description>From 2020-2021 I worked on researching irregular algorithm acceleration using CGRAs. While Barnes-Hut is easily parallelizable, there are interesting methods that can be used to exploit cache locality to further accelerate it.
+Mapping this algorithm to a CGRA was particularly hard because the tree traversal appears to require a variable state size (ie. a stack or recursive function calls). Since the CGRA has a fixed amount of data that can easily fit into the pipeline, this becomes challenging.</description><content>&lt;p>From 2020-2021 I worked on researching irregular algorithm acceleration using
+CGRAs. While Barnes-Hut is easily parallelizable, there are interesting methods
+that can be used to exploit cache locality to further accelerate it.&lt;/p>
+&lt;p>Mapping
+this algorithm to a CGRA was particularly hard because the tree traversal
+appears to require a variable state size (ie. a stack or recursive function
+calls). Since the CGRA has a fixed amount of data that can easily fit into the
+pipeline, this becomes challenging. Fortunately the algorithm can be mapped so
+the tree traversal state is fixed in size (and very small).&lt;/p>
+&lt;p>I also designed a small hardware accelerator that could be added to the CGRA to
+help schedule the memory accesses and further increase the performance.&lt;/p>
+&lt;h1 id="links">Links&lt;/h1>
+&lt;ul>
+&lt;li>&lt;a href="/6_UAR_Paper.pdf">Paper&lt;/a>&lt;/li>
+&lt;/ul></content></item><item><title>FPGA Ray Tracer</title><link>/posts/fpga-ray-tracer/</link><pubDate>Sun, 05 Dec 2021 15:27:19 -0500</pubDate><guid>/posts/fpga-ray-tracer/</guid><description>This was my final project for 6.111 that I developed with Cece Chu. As the second FPGA project that I spent a considerable amount of time on, I focused on doing a lot of simulation and testing (as one should with FPGAs). Since our approach to rendering was a little unusual and based on fixed point math, the simulation was critical to validating the concept of the system.
+All of the simulation was done using verilator to do unit testing, integration testing, and produce simulated renders.</description><content>&lt;p>This was my final project for 6.111 that I developed with Cece Chu. As the
+second FPGA project that I spent a considerable amount of time on, I focused on
+doing a lot of simulation and testing (as one should with FPGAs). Since our
+approach to rendering was a little unusual and based on fixed point math, the
+simulation was critical to validating the concept of the system.&lt;/p>
+&lt;p>All of the simulation was done using verilator to do unit testing, integration
+testing, and produce simulated renders.&lt;/p>
+&lt;h1 id="links">Links&lt;/h1>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/huntingt/6111-final-project">Source Code&lt;/a>&lt;/li>
+&lt;li>&lt;a href="/6_111_paper.pdf">Final Paper&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://web.mit.edu/6.111/volume2/www/f2019/projects/ray_s.mp4">Video&lt;/a>&lt;/li>
+&lt;/ul></content></item><item><title>Audio Chat</title><link>/posts/audio-chat/</link><pubDate>Sun, 05 Dec 2021 11:11:39 -0500</pubDate><guid>/posts/audio-chat/</guid><description>I made this simple audio chat software to play with signal modulation and encoding. The signal is encoded using 4-QAM or 16-QAM and uses matched SRRC filters. The hardest part of the system was the preamble detection used to start and determine the corrections necessary for a signal to be received. The software is also complicated by the fact that it is designed to operate in a chat system and thus does the signal detection and demodulation in real time.</description><content>
+&lt;img src="/demo.png" class="center" style="border-radius: 8px; width:50%;" />
+&lt;p>I made this simple audio chat software to play with signal modulation and
+encoding. The signal is encoded using 4-QAM or 16-QAM and uses matched SRRC
+filters. The hardest part of the system was
+the preamble detection used to start and determine the corrections necessary
+for a signal to be received. The software is also complicated by the fact
+that it is designed to operate in a chat system and thus does the signal
+detection and demodulation in real time.&lt;/p>
+&lt;h1 id="signal-detection">Signal Detection&lt;/h1>
+&lt;h2 id="first-attempt">First Attempt&lt;/h2>
+&lt;p>When I was first designing the signal detection, I stayed away from correlating
+the expected preamble samples against the signal and instead followed a state
+machine based approach that requires less computation. I did this by holding
+the modulating a &lt;code>1+0.j&lt;/code> in the QI plane for &lt;code>N&lt;/code> symbols. I would then transmit
+&lt;code>-1+0.j&lt;/code> followed by &lt;code>1+0.j&lt;/code> before finally starting the transmission. I could
+first sample the center 50% of the initial preamble and average that to correct
+for the phase and amplitude. The short reversal to &lt;code>-1+0.j&lt;/code> then provided a peak that I
+could fit against a quadratic to synchronize the time.&lt;/p>
+&lt;p>I could then accept or reject the corrections based
+off of minimum amplitude and maximum amplitude variation requirements. This
+inital approach, however, was very tempermental because the time
+synchronization portion of the signal was very short and extremely sensitive to
+noise.&lt;/p>
+&lt;h2 id="second-attempt">Second Attempt&lt;/h2>
+&lt;p>I improved this initial approach by instead alternating between peaks of
+amplitude 1 at phase offsets of 90 degrees and signals of zero. Since we don&amp;rsquo;t
+know the signal phase offset when detecting the preamble, the preamble is
+really encoded in the phase differences.&lt;/p>
+&lt;p>The detection state machine works by recording the most recent &lt;code>N&lt;/code> peaks and the
+times that they occured at, where &lt;code>N&lt;/code> is the number of peaks in the preamble.
+Peaks are detected by entering a detection state once the signal exceeds 80% of
+the maxium previously detected peak. Once the signal falls bellow 60% of the
+current peak maximum, then the peak is recorded as the maxium value in the
+interval.&lt;/p>
+&lt;p>This system does have the problem that spurious noise in the signal band may
+register as an unusually large peak that raises the 80% detection threshold
+above any legitimant preamble signals, causing the system to lockup. Since we
+know the length of the preamble, however, the system simply discards all peaks
+that are too old to detect.&lt;/p>
+&lt;p>Once a sufficient number of peaks have been detected, the detection times can
+be fit to determine the timing offset, and the amplitudes can be multiplied by
+the complex conjugate of the preamble to correct the amplitude and phase
+offsets. If the preamble has acceptibly accurate corrections, then it will be
+accepted and the signal detection will start.&lt;/p>
+&lt;p>This approach has the nice side effect that the minimum detection threshold can be
+significanly lower than in my first approach since this method can
+effictively be interrupted even if it has spurious peaks of smaller amplitude.&lt;/p>
+&lt;h2 id="performance">Performance&lt;/h2>
+&lt;p>1000 random bits modulated with 16-QAM were sent over a AWGN channel with
+varying noise amplitudes and I measured the SNR of the signal and the MER.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Signal SNR (dB)&lt;/th>
+&lt;th>Constellation MER (dB)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>51.7&lt;/td>
+&lt;td>28.4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>23.3&lt;/td>
+&lt;td>22.5&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>17.6&lt;/td>
+&lt;td>17.0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>15.9&lt;/td>
+&lt;td>15.8&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;lt; ~15&lt;/td>
+&lt;td>no detection&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>The preamble detector seems to have a minimum noise floor, but otherwise
+performs fairly well under more challenging situations. Bellow an SNR of about
+15 dB, the preamble detection stops working even though the BER is typically &amp;lt;
+0.01.&lt;/p>
+&lt;p>An example constellation is shown below:&lt;/p>
+&lt;img src="/16qam.png" class="center" style="border-radius: 8px; width:50%;" />
+&lt;h1 id="problems">Problems&lt;/h1>
+&lt;p>Currently, the audio chat app works well when sending and receiving data
+between a computer and itself. When trying to communicate between computers,
+communication reliability can be rather hit or miss, depending on the location
+and the computers. I suspect that the speaker and microphone&amp;rsquo;s frequency
+response are non trivial, and echos along with any post processing in the
+OS are making this very difficult. Ultimantly, I need to do a good job
+characterizing the channel in different configurations to know for sure.&lt;/p>
+&lt;h2 id="decoding">Decoding&lt;/h2>
+&lt;p>I would also like to try incorporating soft decoding by using something like a
+viterbi decoder. I haven&amp;rsquo;t been able to find literature, however, that shows
+how to do this in a fairly general method that would allow puncturing to fine
+tune the code rate. The problem is that the codes are in terms of bits while
+the modem is communicating in symbols in some QAM constellation. So to assign a
+branch metric can be rather hard since there are multiple symbols that may have
+a bit, and not all bits are in a symbol if code puncturing is used to increase
+the code rate.&lt;/p>
+&lt;h1 id="links">Links&lt;/h1>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/huntingt/audio-chat">Source Code&lt;/a>&lt;/li>
+&lt;/ul></content></item><item><title>Photo Server</title><link>/posts/photo-server/</link><pubDate>Sun, 05 Dec 2021 10:30:49 -0500</pubDate><guid>/posts/photo-server/</guid><description>I wrote (and am still working on) this project primarily as a learning experience. If I just wanted a server I would probably (and already have) just wrote the server in javascript on node-js. The use of the sled KV database is nice because it has a good Rust interface and is designed for stateful services, and other embedded database bindings often miss features such as transaction support. Sled, however, isn&amp;rsquo;t 1.</description><content>&lt;p>I wrote (and am still working on) this project primarily as a learning
+experience. If I just wanted a server I would probably (and already have) just
+wrote the server in javascript on node-js. The use of the sled KV database is
+nice because it has a good Rust interface and is designed for stateful
+services, and other embedded database bindings often miss features such as
+transaction support. Sled, however, isn&amp;rsquo;t 1.0 yet and doesn&amp;rsquo;t have a guaranteed
+file layout yet, and the serde KV database combination doesn&amp;rsquo;t lend itself to
+elegant database migrations. The intelligent choice would be to just use
+something that supports SQL of course.&lt;/p>
+&lt;p>The system currently allows user creation, file upload, album creation, and
+album sharing. The albums are based on Google Photo albums where photos are
+grouped by day into sections which are lazily loaded into the frontend to allow
+very large albums. Uploaded photos are thumbnailed by libvips into webp photos
+(better compression than jpeg, and better support than AVIF). Videos are
+thumbnailed using ffmpeg to grab the first frame of the video.&lt;/p>
+&lt;p>The frontend is a SPA built in solid-js, however, it currently lacks elegant
+error handling and isn&amp;rsquo;t pretty.&lt;/p>
+&lt;h1 id="links">Links&lt;/h1>
+&lt;ul>
+&lt;li>A read-only version of the server is &lt;a href="http://inyo.dev">here&lt;/a>. The login email is
+&amp;ldquo;&lt;a href="mailto:test@inyo.dev">test@inyo.dev&lt;/a>&amp;rdquo; and the password is &amp;ldquo;password&amp;rdquo;. The server is hosted on a
+raspberry pi on a dynamic ip address, so don&amp;rsquo;t be surprised if it isn&amp;rsquo;t
+available.&lt;/li>
+&lt;li>&lt;a href="https://github.com/huntingt/photos">Source Code&lt;/a>&lt;/li>
+&lt;/ul></content></item></channel></rss>

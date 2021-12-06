@@ -1,0 +1,135 @@
+<!doctype html><html lang=en>
+<head>
+<meta name=generator content="Hugo 0.89.4">
+<title>Parker's Projects</title>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=description content="An overview of some of the projects I have been working on.">
+<meta name=keywords content>
+<meta name=robots content="noodp">
+<link rel=canonical href=/>
+<link rel=stylesheet href=/assets/style.css>
+<link rel=stylesheet href=/assets/blue.css>
+<link rel=apple-touch-icon href=/img/apple-touch-icon-192x192.png>
+<link rel="shortcut icon" href=/img/favicon/blue.png>
+<meta name=twitter:card content="summary">
+<meta property="og:locale" content="en">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Parker's Projects">
+<meta property="og:description" content="An overview of some of the projects I have been working on.">
+<meta property="og:url" content="/">
+<meta property="og:site_name" content="Parker's Projects">
+<meta property="og:image" content="/img/favicon/blue.png">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+<link href=/index.xml rel=alternate type=application/rss+xml title="Parker's Projects">
+</head>
+<body class=blue>
+<div class="container center headings--one-size">
+<header class=header>
+<div class=header__inner>
+<div class=header__logo>
+<a href=/>
+<div class=logo>
+inyo.dev
+</div>
+</a>
+</div>
+<div class=menu-trigger>menu</div>
+</div>
+<nav class=menu>
+<ul class="menu__inner menu__inner--desktop">
+<li><a href=https://github.com/huntingt>github</a></li>
+</ul>
+<ul class="menu__inner menu__inner--mobile">
+<li><a href=https://github.com/huntingt>github</a></li>
+</ul>
+</nav>
+</header>
+<div class=content>
+<div class=posts>
+<div class="post on-list">
+<h1 class=post-title>
+<a href=/posts/barnes-hut/>CGRA Acceleration of Barnes-Hut</a>
+</h1>
+<div class=post-meta>
+<span class=post-date>
+2021-12-06
+</span>
+</div>
+<div class=post-content>
+From 2020-2021 I worked on researching irregular algorithm acceleration using CGRAs. While Barnes-Hut is easily parallelizable, there are interesting methods that can be used to exploit cache locality to further accelerate it.
+Mapping this algorithm to a CGRA was particularly hard because the tree traversal appears to require a variable state size (ie. a stack or recursive function calls). Since the CGRA has a fixed amount of data that can easily fit into the pipeline, this becomes challenging.
+</div>
+<div>
+<a class="read-more button" href=/posts/barnes-hut/>Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class=post-title>
+<a href=/posts/fpga-ray-tracer/>FPGA Ray Tracer</a>
+</h1>
+<div class=post-meta>
+<span class=post-date>
+2021-12-05
+</span>
+</div>
+<div class=post-content>
+This was my final project for 6.111 that I developed with Cece Chu. As the second FPGA project that I spent a considerable amount of time on, I focused on doing a lot of simulation and testing (as one should with FPGAs). Since our approach to rendering was a little unusual and based on fixed point math, the simulation was critical to validating the concept of the system.
+All of the simulation was done using verilator to do unit testing, integration testing, and produce simulated renders.
+</div>
+<div>
+<a class="read-more button" href=/posts/fpga-ray-tracer/>Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class=post-title>
+<a href=/posts/audio-chat/>Audio Chat</a>
+</h1>
+<div class=post-meta>
+<span class=post-date>
+2021-12-05
+</span>
+</div>
+<div class=post-content>
+I made this simple audio chat software to play with signal modulation and encoding. The signal is encoded using 4-QAM or 16-QAM and uses matched SRRC filters. The hardest part of the system was the preamble detection used to start and determine the corrections necessary for a signal to be received. The software is also complicated by the fact that it is designed to operate in a chat system and thus does the signal detection and demodulation in real time.
+</div>
+<div>
+<a class="read-more button" href=/posts/audio-chat/>Read more →</a>
+</div>
+</div>
+<div class="post on-list">
+<h1 class=post-title>
+<a href=/posts/photo-server/>Photo Server</a>
+</h1>
+<div class=post-meta>
+<span class=post-date>
+2021-12-05
+</span>
+</div>
+<div class=post-content>
+I wrote (and am still working on) this project primarily as a learning experience. If I just wanted a server I would probably (and already have) just wrote the server in javascript on node-js. The use of the sled KV database is nice because it has a good Rust interface and is designed for stateful services, and other embedded database bindings often miss features such as transaction support. Sled, however, isn&rsquo;t 1.
+</div>
+<div>
+<a class="read-more button" href=/posts/photo-server/>Read more →</a>
+</div>
+</div>
+<div class=pagination>
+<div class=pagination__buttons>
+</div>
+</div>
+</div>
+</div>
+<footer class=footer>
+<div class=footer__inner>
+<div class=copyright>
+<span>© 2021 Powered by <a href=http://gohugo.io>Hugo</a></span>
+<span>:: Theme made by <a href=https://twitter.com/panr>panr</a></span>
+</div>
+</div>
+</footer>
+<script src=/assets/main.js></script>
+<script src=/assets/prism.js></script>
+</div>
+</body>
+</html>
