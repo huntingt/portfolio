@@ -63,8 +63,5 @@ theme = "terminal"
 
     [languages.en.menu]
     [[languages.en.menu.main]]
-      name = "Résumé"
-      url = "/resume.pdf"
-    [[languages.en.menu.main]]
       name = "github"
       url = "https://github.com/huntingt"

@@ -23,3 +23,11 @@ thumbnailed using ffmpeg to grab the first frame of the video.
 
 The frontend is a SPA built in solid-js, however, it currently lacks elegant
 error handling and isn't pretty.
+
+# Links
+
+- A read-only version of the server is [here](http://inyo.dev). The login email is
+  "test@inyo.dev" and the password is "password". The server is hosted on a
+  raspberry pi on a dynamic ip address, so don't be surprised if it isn't
+  available.
+- [Source Code](https://github.com/huntingt/photos)
